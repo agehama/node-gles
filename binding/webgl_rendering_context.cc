@@ -966,6 +966,8 @@ napi_status WebGLRenderingContext::Register(napi_env env, napi_value exports) {
 
       // WebGL2 attributes:
       NapiDefineIntProperty(env, GL_TEXTURE_3D, "TEXTURE_3D"),
+      NapiDefineIntProperty(env, GL_RGBA8UI, "RGBA8UI"),
+      NapiDefineIntProperty(env, GL_RGBA_INTEGER, "RGBA_INTEGER"),
   };
 
   // Create constructor

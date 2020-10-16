@@ -230,6 +230,9 @@ class EGLContextWrapper {
   PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
   PFNGLVIEWPORTPROC glViewport;
 
+  // WebGL2RenderingContextBase methods:
+  PFNGLTEXIMAGE3DPROC glTexImage3D;
+
   // ANGLE specific
   PFNGLREQUESTEXTENSIONANGLEPROC glRequestExtensionANGLE;
 

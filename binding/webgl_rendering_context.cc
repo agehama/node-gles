@@ -960,6 +960,12 @@ napi_status WebGLRenderingContext::Register(napi_env env, napi_value exports) {
       NapiDefineIntProperty(env, GL_RED, "RED"),
       NapiDefineIntProperty(env, GL_SYNC_GPU_COMMANDS_COMPLETE,
                             "SYNC_GPU_COMMANDS_COMPLETE"),
+
+      // WebGL2RenderingContextBase methods:
+      NAPI_DEFINE_METHOD("texImage3D", TexImage3D),
+
+      // WebGL2 attributes:
+      NapiDefineIntProperty(env, GL_TEXTURE_3D, "TEXTURE_3D"),
   };
 
   // Create constructor
@@ -5636,6 +5642,89 @@ napi_value WebGLRenderingContext::Viewport(napi_env env,
   ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
 
   context->eglContextWrapper_->glViewport(x, y, width, height);
+
+#if DEBUG
+  context->CheckForErrors();
+#endif
+  return nullptr;
+}
+
+/* static */
+napi_value WebGLRenderingContext::TexImage3D(napi_env env,
+                                             napi_callback_info info) {
+  LOG_CALL("TexImage3D");
+
+  napi_status nstatus;
+
+  size_t argc = 9;
+  napi_value args[9];
+  napi_value js_this;
+  nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLsizei width;
+  GLsizei height;
+  GLsizei depth;
+  GLsizei border;
+  GLenum format;
+  GLint type;
+  ArrayLikeBuffer alb;
+
+  if (argc == 9) {
+    ENSURE_ARGC_RETVAL(env, argc, 9, nullptr);
+
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[0], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[1], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[2], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[3], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[4], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[5], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[6], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[7], nullptr);
+    ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[8], nullptr);
+
+    nstatus = napi_get_value_int32(env, args[3], &width);
+    ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+    nstatus = napi_get_value_int32(env, args[4], &height);
+    ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+    nstatus = napi_get_value_int32(env, args[5], &depth);
+    ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+    nstatus = napi_get_value_int32(env, args[6], &border);
+    ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+    nstatus = napi_get_value_uint32(env, args[7], &format);
+    ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+    nstatus = napi_get_value_int32(env, args[8], &type);
+    ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  } else {
+      NAPI_THROW_ERROR(env, "invalid args");
+      return nullptr;
+  }
+
+  GLenum target;
+  nstatus = napi_get_value_uint32(env, args[0], &target);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLint level;
+  nstatus = napi_get_value_int32(env, args[1], &level);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLenum internal_format;
+  nstatus = napi_get_value_uint32(env, args[2], &internal_format);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  WebGLRenderingContext *context = nullptr;
+  nstatus = UnwrapContext(env, js_this, &context);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  context->eglContextWrapper_->glTexImage3D(target, level, internal_format,
+                                            width, height, depth, border, format, type,
+                                            alb.data);
 
 #if DEBUG
   context->CheckForErrors();

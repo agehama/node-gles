@@ -441,6 +441,9 @@ void EGLContextWrapper::BindProcAddresses() {
   glViewport =
       reinterpret_cast<PFNGLVIEWPORTPROC>(eglGetProcAddress("glViewport"));
 
+  glTexImage3D =
+      reinterpret_cast<PFNGLTEXIMAGE3DPROC>(eglGetProcAddress("glTexImage3D"));
+
   // ANGLE specific
   glRequestExtensionANGLE = reinterpret_cast<PFNGLREQUESTEXTENSIONANGLEPROC>(
       eglGetProcAddress("glRequestExtensionANGLE"));

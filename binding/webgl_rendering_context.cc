@@ -5656,8 +5656,8 @@ napi_value WebGLRenderingContext::TexImage3D(napi_env env,
 
   napi_status nstatus;
 
-  size_t argc = 9;
-  napi_value args[9];
+  size_t argc = 10;
+  napi_value args[10];
   napi_value js_this;
   nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
   ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
@@ -5670,8 +5670,8 @@ napi_value WebGLRenderingContext::TexImage3D(napi_env env,
   GLint type;
   ArrayLikeBuffer alb;
 
-  if (argc == 9) {
-    ENSURE_ARGC_RETVAL(env, argc, 9, nullptr);
+  if (argc == 10) {
+    ENSURE_ARGC_RETVAL(env, argc, 10, nullptr);
 
     ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[0], nullptr);
     ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[1], nullptr);

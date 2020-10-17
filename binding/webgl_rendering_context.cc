@@ -989,6 +989,7 @@ napi_status WebGLRenderingContext::Register(napi_env env, napi_value exports) {
       NapiDefineIntProperty(env, GL_TEXTURE_3D, "TEXTURE_3D"),
       NapiDefineIntProperty(env, GL_RGBA8UI, "RGBA8UI"),
       NapiDefineIntProperty(env, GL_RGBA_INTEGER, "RGBA_INTEGER"),
+      NapiDefineIntProperty(env, GL_COLOR, "COLOR"),
       NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT1, "COLOR_ATTACHMENT1"),
       NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT2, "COLOR_ATTACHMENT2"),
       NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT3, "COLOR_ATTACHMENT3"),

@@ -36,6 +36,7 @@ namespace nodejsgl {
 enum NodeJSGLArrayType {
   kInt32 = 0,
   kFloat32 = 1,
+  kUint32 = 2,
 };
 
 // Class to automatically handle V8 buffers (TypedArrays/Arrays) with
@@ -61,6 +62,9 @@ class ArrayLikeBuffer {
         case kFloat32:
           delete static_cast<float *>(data);
           break;
+        case kUint32:
+          delete static_cast<uint32_t *>(data);
+          break;
         default:
           fprintf(
               stderr,
@@ -75,6 +79,8 @@ class ArrayLikeBuffer {
         return length / sizeof(int32_t);
       case kFloat32:
         return length / sizeof(float);
+      case kUint32:
+        return length / sizeof(uint32_t);
       default:
         fprintf(
             stderr,
@@ -963,11 +969,30 @@ napi_status WebGLRenderingContext::Register(napi_env env, napi_value exports) {
 
       // WebGL2RenderingContextBase methods:
       NAPI_DEFINE_METHOD("texImage3D", TexImage3D),
+      NAPI_DEFINE_METHOD("framebufferTextureLayer", FramebufferTextureLayer),
+      NAPI_DEFINE_METHOD("drawBuffers", DrawBuffers),
+      NAPI_DEFINE_METHOD("clearBufferuiv", ClearBufferuiv),
+      NAPI_DEFINE_METHOD("glReadBuffer", ReadBuffer),
 
       // WebGL2 attributes:
       NapiDefineIntProperty(env, GL_TEXTURE_3D, "TEXTURE_3D"),
       NapiDefineIntProperty(env, GL_RGBA8UI, "RGBA8UI"),
       NapiDefineIntProperty(env, GL_RGBA_INTEGER, "RGBA_INTEGER"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT1, "COLOR_ATTACHMENT1"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT2, "COLOR_ATTACHMENT2"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT3, "COLOR_ATTACHMENT3"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT4, "COLOR_ATTACHMENT4"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT5, "COLOR_ATTACHMENT5"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT6, "COLOR_ATTACHMENT6"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT7, "COLOR_ATTACHMENT7"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT8, "COLOR_ATTACHMENT8"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT9, "COLOR_ATTACHMENT9"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT10, "COLOR_ATTACHMENT10"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT11, "COLOR_ATTACHMENT11"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT12, "COLOR_ATTACHMENT12"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT13, "COLOR_ATTACHMENT13"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT14, "COLOR_ATTACHMENT14"),
+      NapiDefineIntProperty(env, GL_COLOR_ATTACHMENT15, "COLOR_ATTACHMENT15"),
   };
 
   // Create constructor
@@ -5727,6 +5752,167 @@ napi_value WebGLRenderingContext::TexImage3D(napi_env env,
   context->eglContextWrapper_->glTexImage3D(target, level, internal_format,
                                             width, height, depth, border, format, type,
                                             alb.data);
+
+#if DEBUG
+  context->CheckForErrors();
+#endif
+  return nullptr;
+}
+
+/* static */
+napi_value WebGLRenderingContext::FramebufferTextureLayer(napi_env env,
+                                                          napi_callback_info info) {
+  LOG_CALL("FramebufferTextureLayer");
+
+  napi_status nstatus;
+
+  size_t argc = 5;
+  napi_value args[5];
+  napi_value js_this;
+  nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  ENSURE_ARGC_RETVAL(env, argc, 5, nullptr);
+
+  GLenum target;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[0], nullptr);
+  nstatus = napi_get_value_uint32(env, args[0], &target);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLenum attachment;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[1], nullptr);
+  nstatus = napi_get_value_uint32(env, args[1], &attachment);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLuint texture;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[2], nullptr);
+  nstatus = napi_get_value_uint32(env, args[2], &texture);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLint level;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[3], nullptr);
+  nstatus = napi_get_value_int32(env, args[3], &level);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLint layer;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[4], nullptr);
+  nstatus = napi_get_value_int32(env, args[4], &layer);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  WebGLRenderingContext *context = nullptr;
+  nstatus = UnwrapContext(env, js_this, &context);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  context->eglContextWrapper_->glFramebufferTextureLayer(
+      target, attachment, texture, level, layer);
+
+#if DEBUG
+  context->CheckForErrors();
+#endif
+  return nullptr;
+}
+
+/* static */
+napi_value WebGLRenderingContext::DrawBuffers(napi_env env,
+                                              napi_callback_info info) {
+  LOG_CALL("DrawBuffers");
+
+  napi_status nstatus;
+
+  size_t argc = 1;
+  napi_value args[1];
+  napi_value js_this;
+  nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  ENSURE_ARGC_RETVAL(env, argc, 1, nullptr);
+
+  ArrayLikeBuffer buffers(kUint32);
+  nstatus = GetArrayLikeBuffer(env, args[0], &buffers);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  WebGLRenderingContext* context = nullptr;
+  nstatus = UnwrapContext(env, js_this, &context);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  context->eglContextWrapper_->glDrawBuffers(
+      static_cast<GLsizei>(buffers.size()),
+      static_cast<GLenum*>(buffers.data));
+
+#if DEBUG
+  context->CheckForErrors();
+#endif
+  return nullptr;
+}
+
+/* static */
+napi_value WebGLRenderingContext::ClearBufferuiv(napi_env env,
+                                                 napi_callback_info info) {
+  LOG_CALL("ClearBufferuiv");
+
+  napi_status nstatus;
+
+  size_t argc = 3;
+  napi_value args[3];
+  napi_value js_this;
+  nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  ENSURE_ARGC_RETVAL(env, argc, 3, nullptr);
+
+  GLenum buffer;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[0], nullptr);
+  nstatus = napi_get_value_uint32(env, args[0], &buffer);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  GLint drawbuffer;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[1], nullptr);
+  nstatus = napi_get_value_int32(env, args[1], &drawbuffer);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  ArrayLikeBuffer value(kUint32);
+  nstatus = GetArrayLikeBuffer(env, args[2], &value);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  WebGLRenderingContext* context = nullptr;
+  nstatus = UnwrapContext(env, js_this, &context);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  context->eglContextWrapper_->glClearBufferuiv(
+      buffer, drawbuffer,
+      static_cast<GLuint*>(value.data));
+
+#if DEBUG
+  context->CheckForErrors();
+#endif
+  return nullptr;
+}
+
+/* static */
+napi_value WebGLRenderingContext::ReadBuffer(napi_env env,
+                                             napi_callback_info info) {
+  LOG_CALL("ReadBuffer");
+
+  napi_status nstatus;
+
+  size_t argc = 1;
+  napi_value args[1];
+  napi_value js_this;
+  nstatus = napi_get_cb_info(env, info, &argc, args, &js_this, nullptr);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  ENSURE_ARGC_RETVAL(env, argc, 1, nullptr);
+
+  GLenum src;
+  ENSURE_VALUE_IS_NUMBER_RETVAL(env, args[0], nullptr);
+  nstatus = napi_get_value_uint32(env, args[0], &src);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  WebGLRenderingContext* context = nullptr;
+  nstatus = UnwrapContext(env, js_this, &context);
+  ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
+
+  context->eglContextWrapper_->glReadBuffer(src);
 
 #if DEBUG
   context->CheckForErrors();

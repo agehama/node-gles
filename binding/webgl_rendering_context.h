@@ -189,6 +189,10 @@ class WebGLRenderingContext {
 
   // WebGL2RenderingContextBase methods:
   static napi_value TexImage3D(napi_env env, napi_callback_info info);
+  static napi_value FramebufferTextureLayer(napi_env env, napi_callback_info info);
+  static napi_value DrawBuffers(napi_env env, napi_callback_info info);
+  static napi_value ClearBufferuiv(napi_env env, napi_callback_info info);
+  static napi_value ReadBuffer(napi_env env, napi_callback_info info);
 
   static napi_ref constructor_ref_;
 

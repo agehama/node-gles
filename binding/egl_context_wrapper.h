@@ -232,6 +232,10 @@ class EGLContextWrapper {
 
   // WebGL2RenderingContextBase methods:
   PFNGLTEXIMAGE3DPROC glTexImage3D;
+  PFNGLFRAMEBUFFERTEXTURELAYERPROC glFramebufferTextureLayer;
+  PFNGLDRAWBUFFERSPROC glDrawBuffers;
+  PFNGLCLEARBUFFERUIVPROC glClearBufferuiv;
+  PFNGLREADBUFFERPROC glReadBuffer;
 
   // ANGLE specific
   PFNGLREQUESTEXTENSIONANGLEPROC glRequestExtensionANGLE;

@@ -443,6 +443,14 @@ void EGLContextWrapper::BindProcAddresses() {
 
   glTexImage3D =
       reinterpret_cast<PFNGLTEXIMAGE3DPROC>(eglGetProcAddress("glTexImage3D"));
+  glFramebufferTextureLayer =
+      reinterpret_cast<PFNGLFRAMEBUFFERTEXTURELAYERPROC>(eglGetProcAddress("glFramebufferTextureLayer"));
+  glDrawBuffers =
+      reinterpret_cast<PFNGLDRAWBUFFERSPROC>(eglGetProcAddress("glDrawBuffers"));
+  glClearBufferuiv =
+      reinterpret_cast<PFNGLCLEARBUFFERUIVPROC>(eglGetProcAddress("glClearBufferuiv"));
+  glReadBuffer =
+      reinterpret_cast<PFNGLREADBUFFERPROC>(eglGetProcAddress("glReadBuffer"));
 
   // ANGLE specific
   glRequestExtensionANGLE = reinterpret_cast<PFNGLREQUESTEXTENSIONANGLEPROC>(

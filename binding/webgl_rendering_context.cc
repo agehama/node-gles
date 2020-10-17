@@ -983,7 +983,7 @@ napi_status WebGLRenderingContext::Register(napi_env env, napi_value exports) {
       NAPI_DEFINE_METHOD("framebufferTextureLayer", FramebufferTextureLayer),
       NAPI_DEFINE_METHOD("drawBuffers", DrawBuffers),
       NAPI_DEFINE_METHOD("clearBufferuiv", ClearBufferuiv),
-      NAPI_DEFINE_METHOD("glReadBuffer", ReadBuffer),
+      NAPI_DEFINE_METHOD("readBuffer", ReadBuffer),
 
       // WebGL2 attributes:
       NapiDefineIntProperty(env, GL_TEXTURE_3D, "TEXTURE_3D"),
@@ -5848,7 +5848,7 @@ napi_value WebGLRenderingContext::DrawBuffers(napi_env env,
   ENSURE_NAPI_OK_RETVAL(env, nstatus, nullptr);
 
   context->eglContextWrapper_->glDrawBuffers(
-      static_cast<GLsizei>(buffers.size()),
+      static_cast<GLsizei>(buffers.length),
       static_cast<GLenum*>(buffers.data));
 
 #if DEBUG

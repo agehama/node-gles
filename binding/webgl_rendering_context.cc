@@ -354,6 +354,9 @@ static napi_status GetArrayLikeBuffer(napi_env env, napi_value array_like_value,
       case kInt32:
         alb->data = malloc(sizeof(int32_t) * length);
         break;
+      case kUint32:
+        alb->data = malloc(sizeof(uint32_t) * length);
+        break;
       default:
         NAPI_THROW_ERROR(env, "Unsupported array type for generic arrays!");
         return napi_invalid_arg;
@@ -383,6 +386,14 @@ static napi_status GetArrayLikeBuffer(napi_env env, napi_value array_like_value,
           ENSURE_NAPI_OK_RETVAL(env, nstatus, nstatus);
 
           static_cast<int32_t *>(alb->data)[i] = value;
+          break;
+        }
+        case kUint32: {
+          uint32_t value;
+          nstatus = napi_get_value_uint32(env, cur_value, &value);
+          ENSURE_NAPI_OK_RETVAL(env, nstatus, nstatus);
+
+          static_cast<uint32_t *>(alb->data)[i] = value;
           break;
         }
         default:
